@@ -59,6 +59,11 @@ return [
             'showScriptName' => false,
             'rules' =>
                 [
+
+                    'POST /v1/auth/login' => 'auth/login',
+                    'GET /v1/auth/logout' => 'auth/logout',
+                    'POST /v1/auth/signup' => 'auth/signup',
+
                     'GET /v1/presentations' => 'presentation/index',
                     'GET /v1/slides' => 'slide',
                 ]
