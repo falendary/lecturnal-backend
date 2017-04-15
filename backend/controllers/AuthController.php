@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\helpers\AuthHelper;
 use backend\helpers\HeaderHelper;
 
 use backend\models\AuthToken;
@@ -70,7 +71,7 @@ class AuthController extends Controller
         $headerToken = HeaderHelper::getBearerToken();
         $user = User::findIdentityByAuthToken($headerToken);
 
-        if (isset($headerToken)) {
+        if (AuthHelper::isAuth()) {
             $authToken = new AuthToken();
             if ($authTokenInstance = $authToken::findOne(['token' => $headerToken, 'user_id' => $user->id])) {
 

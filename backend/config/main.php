@@ -65,7 +65,15 @@ return [
                     'POST /v1/auth/signup' => 'auth/signup',
 
                     'GET /v1/presentations' => 'presentation/index',
-                    'GET /v1/slides' => 'slide',
+                    'POST /v1/presentations' => 'presentation/create',
+                    'PUT, PATCH /v1/presentations/<presentationId:\d+>' => 'presentation/update',
+                    'DELETE /v1/presentations/<presentationId:\d+>' => 'presentation/delete',
+
+                    'GET /v1/presentations/<presentationId:\d+>/slides' => 'slide/index',
+                    'POST /v1/presentations/<presentationId:\d+>/slides' => 'slide/create',
+                    'GET /v1/presentations/<presentationId:\d+>/slides/<slideId:\d+>' => 'slide/view',
+                    'PUT, PATCH /v1/presentations/<presentationId:\d+>/slides/<slideId:\d+>' => 'slide/update',
+                    'DELETE /v1/presentations/<presentationId:\d+>/slides/<slideId:\d+>' => 'slide/delete',
                 ]
         ],
 

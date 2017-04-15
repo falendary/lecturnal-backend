@@ -2,9 +2,11 @@
 
 namespace backend\controllers;
 
+use backend\helpers\AuthHelper;
 use Yii;
 use backend\models\Slide;
 use backend\models\SlideSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -31,81 +33,121 @@ class SlideController extends Controller
 
     /**
      * Lists all Slide models.
+     * @param integer $presentationId
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($presentationId)
     {
-        $searchModel = new SlideSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        echo 'test';
+        if (AuthHelper::isAuth()) {
+            $slideModel = new Slide();
 
-//        return $this->render('index', [
-//            'searchModel' => $searchModel,
-//            'dataProvider' => $dataProvider,
-//        ]);
+            $query = $slideModel->find();
+            $query->where(["presentation_id" => $presentationId]);
+
+            $dataProvider = new ActiveDataProvider(array(
+                'query' => $query,
+                'pagination' => false
+            ));
+
+            return $dataProvider->getModels();
+        } else {
+            return array("errors" => array("permission denied"));
+        }
     }
 
     /**
      * Displays a single Slide model.
-     * @param integer $id
+     * @param integer $presentationId
+     * @param integer $slideId
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($presentationId, $slideId)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+//        echo '$presentationId '.$presentationId.' break';
+//        echo '$slideId '.$slideId;
+
+        return $this->findModel($slideId);
     }
 
     /**
      * Creates a new Slide model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     * @param integer $presentationId
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($presentationId)
     {
-        $model = new Slide();
+        if (AuthHelper::isAuth()) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $request = Yii::$app->request;
+            if ($request->isPost || $request->isAjax) {
+
+                $request_body = $request->rawBody;
+                $data = json_decode($request_body);
+
+                $model = new Slide();
+                $model->created_at = date('Y-m-d H:m:s');
+                $model->presentation_id = $presentationId;
+                $model->content = $data->content;
+                $model->save();
+
+                return $model;
+            } else {
+                return array("errors" => array("method is not supported"));
+            }
+
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            return array("errors" => array("permission denied"));
         }
     }
 
     /**
      * Updates an existing Slide model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param integer $presentationId
+     * @param integer $slideId
      * @return mixed
      */
-    public function actionUpdate($id)
+    public function actionUpdate($presentationId, $slideId)
     {
-        $model = $this->findModel($id);
+        if (AuthHelper::isAuth()) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $request = Yii::$app->request;
+            if ($request->isPut || $request->isAjax) {
+
+                $request_body = $request->rawBody;
+                $data = json_decode($request_body);
+
+                if ($slide = Slide::findOne(['id' => $slideId, 'presentation_id' => $presentationId])) {
+
+                    $slide->content = $data->content;
+                    $slide->save();
+
+                    return $slide;
+
+                } else {
+                    return array("errors" => array("slide not found"));
+                }
+            } else {
+                return array("errors" => array("method is not supported"));
+            }
+
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            return array("errors" => array("permission denied"));
         }
     }
 
     /**
      * Deletes an existing Slide model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param integer $presentationId
+     * @param integer $slideId
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete($presentationId, $slideId)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $this->findModel($slideId)->delete();
     }
 
     /**

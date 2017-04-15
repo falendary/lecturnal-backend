@@ -2,9 +2,12 @@
 
 namespace backend\controllers;
 
+use backend\helpers\AuthHelper;
+use backend\models\PresentationPermission;
 use Yii;
 use backend\models\Presentation;
 use backend\models\PresentationSearch;
+use yii\data\ActiveDataProvider;
 use yii\debug\components\search\matchers\Base;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -39,25 +42,20 @@ class PresentationController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new PresentationSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (AuthHelper::isAuth()) {
+            $presentationModel = new Presentation();
 
-        echo 'test';
+            $query = $presentationModel->find();
 
-//        return array("test" => 'Hello world');
-//        return $dataProvider->getModels();
-    }
+            $dataProvider = new ActiveDataProvider(array(
+                'query' => $query,
+                'pagination' => false
+            ));
 
-    /**
-     * Displays a single Presentation model.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+            return $dataProvider->getModels();
+        } else {
+            return array("errors" => array("permission denied"));
+        }
     }
 
     /**
@@ -67,47 +65,47 @@ class PresentationController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Presentation();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (AuthHelper::isAuth()) {
+
+            $request = Yii::$app->request;
+            if ($request->isPost || $request->isAjax) {
+
+                $request_body = $request->rawBody;
+                $data = json_decode($request_body);
+                $user = AuthHelper::getUser();
+
+                $model = new Presentation();
+                $model->created_at = date('Y-m-d H:m:s');
+                $model->name = $data->name;
+                $model->save();
+
+                $presentationPermission = new PresentationPermission();
+
+                $presentationPermission->presentation_id = $model->id;
+                $presentationPermission->user_id = $user->id;
+                $presentationPermission->save();
+
+                return $model;
+            } else {
+                return array("errors" => array("method is not supported"));
+            }
+
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            return array("errors" => array("permission denied"));
         }
-    }
 
-    /**
-     * Updates an existing Presentation model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
     }
 
     /**
      * Deletes an existing Presentation model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param integer $presentationId
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete($presentationId)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $this->findModel($presentationId)->delete();
     }
 
     /**
