@@ -58,11 +58,13 @@ class AuthController extends Controller
         elseif ($value == null) {
             return \Yii::$app->request->cookies->getValue($name);
         }
+//        yii\web\Cookie::httpOnly = false;
         $options['name'] = $name;
         $options['value'] = $value;
         $options['expire'] = $expire ?: time() + 86400 * 365;
+        $options['httpOnly'] = false;
         $cookie = new Cookie($options);
-        yii\web\Cookie::httpOnly = false;
+
         \Yii::$app->response->cookies->add($cookie);
     }
 
