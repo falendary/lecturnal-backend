@@ -31,6 +31,7 @@ return [
         ],
         'session' => [
             // this is the name of the session cookie used for login on the backend
+            'cookieParams' => array('httponly' => false),
             'name' => 'advanced-backend',
         ],
         'log' => [
