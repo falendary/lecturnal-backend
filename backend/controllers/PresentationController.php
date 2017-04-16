@@ -59,6 +59,20 @@ class PresentationController extends Controller
     }
 
     /**
+     * Displays a single Slide model.
+     * @param integer $presentationId
+     * @param integer $slideId
+     * @return mixed
+     */
+    public function actionView($presentationId)
+    {
+//        echo '$presentationId '.$presentationId.' break';
+//        echo '$slideId '.$slideId;
+
+        return $this->findModel($presentationId);
+    }
+
+    /**
      * Creates a new Presentation model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -95,6 +109,42 @@ class PresentationController extends Controller
             return array("errors" => array("permission denied"));
         }
 
+    }
+
+    /**
+     * Updates an existing Slide model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $presentationId
+     * @param integer $slideId
+     * @return mixed
+     */
+    public function actionUpdate($presentationId)
+    {
+        if (AuthHelper::isAuth()) {
+
+            $request = Yii::$app->request;
+            if ($request->isPut || $request->isAjax) {
+
+                $request_body = $request->rawBody;
+                $data = json_decode($request_body);
+
+                if ($presentation = Presentation::findOne(['id' => $presentationId])) {
+
+                    $presentation->name = $data->name;
+                    $presentation->save();
+
+                    return $presentation;
+
+                } else {
+                    return array("errors" => array("slide not found"));
+                }
+            } else {
+                return array("errors" => array("method is not supported"));
+            }
+
+        } else {
+            return array("errors" => array("permission denied"));
+        }
     }
 
     /**

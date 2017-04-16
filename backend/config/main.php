@@ -15,6 +15,7 @@ return [
         'request' => [
             'class' => '\yii\web\Request',
             'enableCookieValidation' => false,
+            'enableCsrfValidation' => false,
             'baseUrl' => '/backend/web/',
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
@@ -66,13 +67,14 @@ return [
 
                     'GET /v1/presentations' => 'presentation/index',
                     'POST /v1/presentations' => 'presentation/create',
-                    'PUT, PATCH /v1/presentations/<presentationId:\d+>' => 'presentation/update',
+                    'GET /v1/presentations/<presentationId:\d+>' => 'presentation/view',
+                    'PUT /v1/presentations/<presentationId:\d+>' => 'presentation/update',
                     'DELETE /v1/presentations/<presentationId:\d+>' => 'presentation/delete',
 
                     'GET /v1/presentations/<presentationId:\d+>/slides' => 'slide/index',
                     'POST /v1/presentations/<presentationId:\d+>/slides' => 'slide/create',
                     'GET /v1/presentations/<presentationId:\d+>/slides/<slideId:\d+>' => 'slide/view',
-                    'PUT, PATCH /v1/presentations/<presentationId:\d+>/slides/<slideId:\d+>' => 'slide/update',
+                    'PUT /v1/presentations/<presentationId:\d+>/slides/<slideId:\d+>' => 'slide/update',
                     'DELETE /v1/presentations/<presentationId:\d+>/slides/<slideId:\d+>' => 'slide/delete',
                 ]
         ],
