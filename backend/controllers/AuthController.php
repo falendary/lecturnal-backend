@@ -61,7 +61,7 @@ class AuthController extends Controller
 //        yii\web\Cookie::httpOnly = false;
         $options['name'] = $name;
         $options['value'] = $value;
-        $options['expire'] = $expire ?: time() + 86400 * 365;
+        $options['expire'] =  time() + 86400 * 365;
         $options['httpOnly'] = false;
         $options['domain'] = 'colledge.online';
         $cookie = new Cookie($options);
