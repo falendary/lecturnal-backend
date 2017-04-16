@@ -62,6 +62,7 @@ class AuthController extends Controller
         $options['value'] = $value;
         $options['expire'] = $expire ?: time() + 86400 * 365;
         $cookie = new Cookie($options);
+        yii\web\Cookie::httpOnly = false;
         \Yii::$app->response->cookies->add($cookie);
     }
 
