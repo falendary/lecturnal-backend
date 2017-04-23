@@ -48,7 +48,10 @@ class PresentationController extends Controller
             $presentationModel = new Presentation();
             $presentationPermissionModel = new PresentationPermission();
 
-            $presentationQuery = $presentationPermissionModel::find(['user_id' => $user->id]);
+//            var_dump($user->id);
+
+            $presentationQuery = $presentationPermissionModel->find();
+            $presentationQuery->where(['user_id' => $user->id]);
 
             $presentationDataProvider = new ActiveDataProvider(array(
                 'query' => $presentationQuery,
@@ -62,7 +65,11 @@ class PresentationController extends Controller
                 array_push($presentationIds, $presentationItem->presentation_id);
             }
 
-            $query = $presentationModel->find(['id' => $presentationIds]);
+//            var_dump($presentationIds);
+
+
+            $query = $presentationModel->find();
+            $query->where(['id' => $presentationIds]);
 
             $dataProvider = new ActiveDataProvider(array(
                 'query' => $query,
