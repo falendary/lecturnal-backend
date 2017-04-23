@@ -59,7 +59,7 @@ class PresentationController extends Controller
             $presentationIds = array();
 
             foreach($presentations as $presentationItem) {
-                array_push($presentationIds, $presentationItem->id);
+                array_push($presentationIds, $presentationItem->presentation_id);
             }
 
             $query = $presentationModel->find(['id' => $presentationIds]);
