@@ -43,9 +43,26 @@ class PresentationController extends Controller
     public function actionIndex()
     {
         if (AuthHelper::isAuth()) {
-            $presentationModel = new Presentation();
 
-            $query = $presentationModel->find();
+            $user = AuthHelper::getUser();
+            $presentationModel = new Presentation();
+            $presentationPermissionModel = new PresentationPermission();
+
+            $presentationQuery = $presentationPermissionModel::find(['user_id' => $user->id]);
+
+            $presentationDataProvider = new ActiveDataProvider(array(
+                'query' => $presentationQuery,
+                'pagination' => false
+            ));
+
+            $presentations = $presentationDataProvider->getModels();
+            $presentationIds = array();
+
+            foreach($presentations as $presentationItem) {
+                array_push($presentationIds, $presentationItem);
+            }
+
+            $query = $presentationModel->find(['id' => $presentationIds]);
 
             $dataProvider = new ActiveDataProvider(array(
                 'query' => $query,
