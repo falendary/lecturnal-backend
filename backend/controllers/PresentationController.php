@@ -95,7 +95,7 @@ class PresentationController extends Controller
 
         $user = AuthHelper::getUser();
 
-        if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
+        if ($permission = PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
             return $this->findModel($presentationId);
         } else {
             return array("errors" => array("permission denied"));
