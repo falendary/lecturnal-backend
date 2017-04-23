@@ -43,11 +43,9 @@ class SlideController extends Controller
         if (AuthHelper::isAuth()) {
             $slideModel = new Slide();
 
-
             $user = AuthHelper::getUser();
-            $presentationPermissionModel = new PresentationPermission();
 
-            if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+            if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
                 $query = $slideModel->find();
                 $query->where(["presentation_id" => $presentationId]);
 
@@ -77,9 +75,8 @@ class SlideController extends Controller
 //        echo '$slideId '.$slideId;
 
         $user = AuthHelper::getUser();
-        $presentationPermissionModel = new PresentationPermission();
 
-        if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+        if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
             return $this->findModel($slideId);
         } else {
             return array("errors" => array("permission denied"));
@@ -100,9 +97,8 @@ class SlideController extends Controller
             if ($request->isPost || $request->isAjax) {
 
                 $user = AuthHelper::getUser();
-                $presentationPermissionModel = new PresentationPermission();
 
-                if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+                if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
                     $request_body = $request->rawBody;
                     $data = json_decode($request_body);
 
@@ -140,9 +136,8 @@ class SlideController extends Controller
             if ($request->isPut || $request->isAjax) {
 
                 $user = AuthHelper::getUser();
-                $presentationPermissionModel = new PresentationPermission();
 
-                if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+                if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
                     $request_body = $request->rawBody;
                     $data = json_decode($request_body);
 
@@ -179,9 +174,8 @@ class SlideController extends Controller
     {
 
         $user = AuthHelper::getUser();
-        $presentationPermissionModel = new PresentationPermission();
 
-        if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+        if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
             $this->findModel($slideId)->delete();
         } else {
             return array("errors" => array("permission denied"));

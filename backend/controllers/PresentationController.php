@@ -94,9 +94,8 @@ class PresentationController extends Controller
 //        echo '$slideId '.$slideId;
 
         $user = AuthHelper::getUser();
-        $presentationPermissionModel = new PresentationPermission();
 
-        if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+        if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
             return $this->findModel($presentationId);
         } else {
             return array("errors" => array("permission denied"));
@@ -156,11 +155,9 @@ class PresentationController extends Controller
             $request = Yii::$app->request;
             if ($request->isPut || $request->isAjax) {
 
-
                 $user = AuthHelper::getUser();
-                $presentationPermissionModel = new PresentationPermission();
 
-                if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+                if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
 
                     $request_body = $request->rawBody;
                     $data = json_decode($request_body);
@@ -200,9 +197,8 @@ class PresentationController extends Controller
     {
 
         $user = AuthHelper::getUser();
-        $presentationPermissionModel = new PresentationPermission();
 
-        if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+        if (PresentationPermission::find()->where(['user_id' => $user->id, 'presentation_id' => $presentationId])->one()) {
             $this->findModel($presentationId)->delete();
         } else {
             return array("errors" => array("permission denied"));
