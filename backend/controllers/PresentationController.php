@@ -61,7 +61,7 @@ class PresentationController extends Controller
             $presentations = $presentationDataProvider->getModels();
             $presentationIds = array();
 
-            foreach($presentations as $presentationItem) {
+            foreach ($presentations as $presentationItem) {
                 array_push($presentationIds, $presentationItem->presentation_id);
             }
 
@@ -93,7 +93,14 @@ class PresentationController extends Controller
 //        echo '$presentationId '.$presentationId.' break';
 //        echo '$slideId '.$slideId;
 
-        return $this->findModel($presentationId);
+        $user = AuthHelper::getUser();
+        $presentationPermissionModel = new PresentationPermission();
+
+        if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+            return $this->findModel($presentationId);
+        } else {
+            return array("errors" => array("permission denied"));
+        }
     }
 
     /**
@@ -149,19 +156,31 @@ class PresentationController extends Controller
             $request = Yii::$app->request;
             if ($request->isPut || $request->isAjax) {
 
-                $request_body = $request->rawBody;
-                $data = json_decode($request_body);
 
-                if ($presentation = Presentation::findOne(['id' => $presentationId])) {
+                $user = AuthHelper::getUser();
+                $presentationPermissionModel = new PresentationPermission();
 
-                    $presentation->name = $data->name;
-                    $presentation->save();
+                if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
 
-                    return $presentation;
+                    $request_body = $request->rawBody;
+                    $data = json_decode($request_body);
+
+                    if ($presentation = Presentation::findOne(['id' => $presentationId])) {
+
+                        $presentation->name = $data->name;
+                        $presentation->save();
+
+                        return $presentation;
+
+                    } else {
+                        return array("errors" => array("slide not found"));
+                    }
+
 
                 } else {
-                    return array("errors" => array("slide not found"));
+                    return array("errors" => array("permission denied"));
                 }
+
             } else {
                 return array("errors" => array("method is not supported"));
             }
@@ -179,7 +198,15 @@ class PresentationController extends Controller
      */
     public function actionDelete($presentationId)
     {
-        $this->findModel($presentationId)->delete();
+
+        $user = AuthHelper::getUser();
+        $presentationPermissionModel = new PresentationPermission();
+
+        if ($presentationPermissionModel::findOne([['user_id' => $user->id, 'presentation_id' => $presentationId]])) {
+            $this->findModel($presentationId)->delete();
+        } else {
+            return array("errors" => array("permission denied"));
+        }
     }
 
     /**
